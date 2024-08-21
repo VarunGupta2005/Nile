@@ -1,3 +1,16 @@
+// favourites scroller
+function addItem(parent, name, path, price, page) {
+  let item = document.createElement('div');
+  item.classList.add('item-card');
+  item.innerHTML = '<img src="' + path + '" alt="' + name + '"> ' + name + '<div> &#8377; ' + price + '</div> <a href="' + page + '"> shop now &#8594; </a>';
+  parent.appendChild(item);
+}
+let favs = document.querySelector('#favourites');
+
+
+
+
+
 let login_btn = document.querySelector("#login-btn");
 localStorage.setItem('islogged', 'f');
 function updateLoginStatus(str, isLogin) {
@@ -21,6 +34,24 @@ fetch('/nile/auth-status')
       const name = data.username;
       calculateTotalFrequency(data.cart)
       updateLoginStatus(name, true);
+      fetch('/nile/fav/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ favourites: data.favourites })
+      })
+      .then(response => response.json())
+      .then(submitResponse => {
+        for (let i = 0; i < submitResponse.length; i++)
+        {
+          let favprod = submitResponse[i];
+          addItem(favs, favprod.name, '../' + favprod.path, favprod.price, `product_page.html?id=${favprod.id}`);
+        }
+      })
+      .catch(error => {
+        console.error('Error submitting cart:', error);
+      });
 
     } else {
       updateLoginStatus("Not logged in", false);
@@ -78,20 +109,3 @@ logOut.addEventListener('click', () => {
       console.error('Error:', error);
     });
 });
-
-// favourites scroller
-function addItem(parent, name, path, price, page) {
-  let item = document.createElement('div');
-  item.classList.add('item-card');
-  item.innerHTML = '<img src="' + path + '" alt="' + name + '"> ' + name + '<div> &#8377; ' + price + '.00</div> <a href="' + page + '"> shop now &#8594; </a>';
-  parent.appendChild(item);
-}
-let favs = document.querySelector('#favourites');
-
-function createProductPage() {
-  return '#';
-}
-
-for (let i = 0; i < 6; i++) {
-  addItem(favs, "best selling headphone " + i, "../images/bestselling/" + i + ".jpg", getRandom(1000, 15000), createProductPage());
-}

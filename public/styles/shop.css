@@ -9,18 +9,23 @@
 
 .categories {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
   padding: 32px;
   gap: 20px;
 }
 
-.button-container {
-  align-self: center;
-  display: flex;
-  text-align: start;
-  flex-wrap: wrap;
-  gap: 16px;
+.categories strong {
+  font-family: "Ysabeau SC", sans-serif;
+  font-size: 20px;
+  font-weight: 550;
 }
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
 .showcase {
   display: flex;
   flex-wrap: wrap;
@@ -74,7 +79,7 @@
   border: none;
   background-color: inherit;
   cursor: pointer;
-  font-size: medium;
+  font-size: 18px;
 }
 
 .categories h2 {
@@ -124,5 +129,7 @@
     gap: 16px;
     padding-bottom: 100px;
   }
-  
+  .categories {
+    flex-direction: column;
+  }
 }

@@ -194,7 +194,7 @@ a{
   text-align: center;
 }
 
-h1 {
+.scroll-card h1 {
   font-size: 54px;
   font-weight: 700;
 }
@@ -212,6 +212,7 @@ h1 {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
+  font-weight: 500;
   max-width: 450px;
   max-height: 520px;
   padding: 8px;
@@ -338,7 +339,7 @@ h1 {
 }
 .item-card {
   max-width: 300px;
-  max-height: 300px;
+  max-height: 370px;
 }
 .scroller {
   min-height: 400px;
@@ -349,6 +350,12 @@ h1 {
 }
 .badge {
   right: 3px;
+}
+.scroll-card h1 {
+  margin-left: 16px;
+  font-size: 34px;
+  font-weight: 700;
+  text-align: start;
 }
 }
 @media only screen and (min-width: 601px) and (max-width: 1024px) {

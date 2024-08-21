@@ -1,31 +1,32 @@
-function addItem(parent, name, path, price, page) {
-  let item = document.createElement('div');
-  item.classList.add('item-card');
-  item.innerHTML = '<img src="' + path + '" alt="' + name + '"> ' + name + '<div> &#8377; ' + price + '.00</div> <a href="' + page + '"> shop now &#8594; </a>';
-  parent.appendChild(item);
-}
-let favs = document.querySelector('#similar');
-
-function createProductPage() {
-  return '#';
-}
-
-function getRandom(a, b) {
-  return Math.floor(Math.random() * (b - a + 1)) + a;
-}
-
-
-for (let i = 0; i < 6; i++) {
-  addItem(favs, "best selling headphone " + i, "../images/bestselling/" + i + ".jpg", getRandom(1000, 15000), createProductPage());
-}
-
 let image = document.querySelector('.item-showcase');
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.innerHTML = message;
+  toast.style.display = 'block';
+  setTimeout(() => {
+    toast.style.display = 'none';
+  }, 2000); // Hide after 2 seconds
+}
 
 function update_data(product) {
   image.innerHTML = '<img src="' + '../' + product.path + '" alt="' + product.name + '">';
   document.querySelector('#iname').innerHTML = product.name;
   document.querySelector('#iprice').innerHTML = '&#8377; ' + product.price
   document.querySelector('#istatus').innerHTML = '<h3>Product Info</h3>' + product.details;
+  const storedUserData = JSON.parse(localStorage.getItem('UserData'));
+  if (storedUserData != null) {
+
+    const index = storedUserData.favourites.findIndex(item => {
+      return Number(item.id) === Number(product.id);
+    });
+    if (index !== -1) {
+      addToFav.style.backgroundColor = 'red';
+    }
+    else {
+      addToFav.style.backgroundColor = 'black';
+    }
+  }
 }
 let productId;
 function setId(id) {
@@ -90,11 +91,14 @@ function calculateTotalFrequency(cart) {
 
 let addToCart = document.getElementById("icart");
 addToCart.addEventListener('click', () => {
+  if (localStorage.getItem('islogged') == 'f')
+  {
+    alert("Please Log in to add items to cart");
+    return;
+  }
   const storedUserData = JSON.parse(localStorage.getItem('UserData'));
-  console.log(storedUserData);
-  console.log(productId)
   if (storedUserData != null) {
-    const index = storedUserData.cart.findIndex(item => item.id === productId);
+    const index = storedUserData.cart.findIndex(item => {return Number(item.id) === Number(productId)});
 
     if (index !== -1) {
       storedUserData.cart[index].frequency++;
@@ -103,11 +107,10 @@ addToCart.addEventListener('click', () => {
       const newItem = { id: productId, frequency: 1 };
       storedUserData.cart.push(newItem);
     }
-    console.log('Updated cart:', storedUserData.cart);
     localStorage.setItem('UserData', JSON.stringify(storedUserData));
-    console.log(storedUserData)
+    showToast('&#10004; Item added successfully');
 
-    fetch('/nile/update-cart', {
+    fetch('/nile/update/cart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -120,12 +123,52 @@ addToCart.addEventListener('click', () => {
       .then(response => response.json())
       .then(data => {
         calculateTotalFrequency(storedUserData.cart)
-        console.log('Cart updated successfully:', data);
       })
       .catch(error => console.error('Error updating cart:', error));
   }
   else {
     console.error('Please login');
+  }
+})
+//productScript.js
+let addToFav = document.getElementById("ifav");
+addToFav.addEventListener('click', () => {
+  const storedUserData = JSON.parse(localStorage.getItem('UserData'));
+  if (storedUserData != null) {
+
+    const index = storedUserData.favourites.findIndex(item => {
+      return Number(item.id) === Number(productId);
+    });
+    if (index !== -1) {
+      storedUserData.favourites.splice(index, 1); 
+      addToFav.style.backgroundColor = 'black';
+      showToast(' &#9825; Item removed from favourites');
+    }
+    else {
+      const newItem = { id: productId, frequency: 1 };
+      addToFav.style.backgroundColor = 'red';
+      storedUserData.favourites.push(newItem);
+      showToast('&#10084; Item added to favourites')
+    }
+    localStorage.setItem('UserData', JSON.stringify(storedUserData));
+
+    fetch('/nile/update/fav', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        favourites: storedUserData.favourites,
+        username: storedUserData.username
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+      })
+      .catch(error => console.error('Error updating fav:', error));
+  }
+  else {
+    alert('Please login to add to favourite');
   }
 })
 
